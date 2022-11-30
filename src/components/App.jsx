@@ -1,11 +1,6 @@
-// Інструкція Pixabay API
-// Зареєструйся та отримай приватний ключ доступу. Для HTTP-запитів використовуй публічний сервіс пошуку зображень Pixabay.
+// 'https://pixabay.com/api/?q=cat&page=1&key=30847710-2a74f0266730d3c25fa6c5c5e&image_type=photo&orientation=horizontal&per_page=12'
 
-// URL-рядок HTTP-запиту.
-
-// https://pixabay.com/api/?q=cat&page=1&key=your_key&image_type=photo&orientation=horizontal&per_page=12
-
-// Pixabay API підтримує пагінацію, за замовчуванням параметр page дорівнює 1. Нехай у відповіді надходить по 12 об'єктів, встановлено в параметрі per_page. Не забудь, що під час пошуку за новим ключовим словом, необхідно скидати значення page до 1.
+// Не забудь, що під час пошуку за новим ключовим словом, необхідно скидати значення page до 1.
 
 // У відповіді від апі приходить масив об'єктів, в яких тобі цікаві лише наступні властивості.
 
@@ -13,19 +8,43 @@
 // webformatURL - посилання на маленьке зображення для списку карток
 // largeImageURL - посилання на велике зображення для модального вікна
 
-export const App = () => {
-  return (
-    <div
-      style={{
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: 40,
-        color: '#010101',
-      }}
-    >
-      React homework template
-    </div>
-  );
-};
+import React, { Component } from 'react';
+import Searchbar from './Searchbar';
+import Notiflix from 'notiflix';
+
+export default class App extends Component {
+  state = {
+    gallery: null,
+    searchQuery: '',
+    loading: false,
+  };
+
+  componentDidUpdate(_, prevState) {
+    const prevQuery = prevState.searchQuery;
+    const nextQuery = this.state.searchQuery;
+    if (prevQuery !== nextQuery) {
+      this.setState({ loading: true });
+      fetch(
+        `https://pixabay.com/api/?q=${nextQuery}&page=1&key=30847710-2a74f0266730d3c25fa6c5c5e&image_type=photo&orientation=horizontal&per_page=12`
+      )
+        .then(response => response.json())
+        .then(gallery => this.setState({ gallery }))
+        .finally(() => this.setState({ loading: false }));
+    }
+  }
+
+  handleFormSubmit = searchQuery => {
+    this.setState({ searchQuery });
+  };
+  render() {
+    const { loading, searchQuery, gallery } = this.state;
+    return (
+      <>
+        <Searchbar onSubmit={this.handleFormSubmit} />
+        {loading && <div>Загружаем</div>}
+        {!searchQuery && <p>Enter something in the search bar</p>}
+        {gallery && <p>{gallery.hits[0]['downloads']}</p>}
+      </>
+    );
+  }
+}
