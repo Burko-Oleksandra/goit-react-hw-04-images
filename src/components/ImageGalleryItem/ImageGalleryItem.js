@@ -17,7 +17,7 @@ export default class ImageGalleryItem extends Component {
     const { imageUrl, text, largeImageUrl } = this.props;
     const { showModal } = this.state;
     return (
-      <li onClick={this.toggle}>
+      <li onClick={this.toggleModal}>
         <Image src={imageUrl} alt={text} width="250" height="166" />
         {showModal && (
           <Modal

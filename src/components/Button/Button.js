@@ -8,7 +8,7 @@ import { LoadMoreBtn } from './Button.styled';
 const Button = ({ onClick }) => {
   return (
     <LoadMoreBtn onClick={onClick} type="button">
-      <TfiMoreAlt size="3em" />
+      <TfiMoreAlt size="3em" color="#483d8b" />
     </LoadMoreBtn>
   );
 };

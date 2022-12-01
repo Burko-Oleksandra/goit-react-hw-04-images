@@ -21,8 +21,8 @@ export default class App extends Component {
     const prevQuery = prevState.searchQuery;
     const nextQuery = this.state.searchQuery;
 
-    if (prevQuery !== nextQuery) {
-      this.setState({ loading: true, gallery: null, page: 1 });
+    if (prevQuery !== nextQuery || this.state.page !== prevState.page) {
+      this.setState({ loading: true });
 
       const response = await fetchImages(nextQuery, this.state.page);
 
@@ -42,9 +42,10 @@ export default class App extends Component {
         );
       }
 
-      if (this.state.page > 1 && this.state.page !== prevState.page) {
-        this.setState(prev => ({
+      if (this.state.page > 1) {
+        return this.setState(prev => ({
           gallery: [...prev.gallery, ...response.hits],
+          loading: false,
         }));
       }
 
@@ -53,7 +54,7 @@ export default class App extends Component {
   }
 
   handleFormSubmit = searchQuery => {
-    this.setState({ searchQuery });
+    this.setState({ searchQuery, page: 1 });
   };
 
   handleLoadMoreImages = () => {

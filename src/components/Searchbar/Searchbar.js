@@ -41,7 +41,7 @@ export default class Searchbar extends Component {
         <Form onSubmit={this.handleSubmit}>
           <Button type="submit">
             <Icon>
-              <BsSearch size="1.7em" />
+              <BsSearch size="1.7em" color="#483d8b" />
             </Icon>
           </Button>
 
