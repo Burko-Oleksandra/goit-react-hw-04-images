@@ -23,7 +23,7 @@ export default class ImageGalleryItem extends Component {
           <Modal
             largeImageUrl={largeImageUrl}
             text={text}
-            onModalClose={this.toggleModal}
+            onClick={this.toggleModal}
           />
         )}
       </li>
