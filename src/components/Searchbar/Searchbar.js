@@ -1,7 +1,7 @@
-//  Компонент приймає один проп onSubmit – функцію для передачі значення інпута під час сабміту форми. Створює DOM-елемент наступної структури.
 import { Component } from 'react';
-import { FcSearch } from 'react-icons/fc';
+import { BsSearch } from 'react-icons/bs';
 import Notiflix from 'notiflix';
+import { Form, Header, Button, Icon, Input } from './Searchbar.styled';
 
 export default class Searchbar extends Component {
   state = {
@@ -16,7 +16,19 @@ export default class Searchbar extends Component {
     event.preventDefault();
 
     if (this.state.searchQuery.trim() === '') {
-      return Notiflix.Notify.warning('Oops! Enter something in the search bar');
+      return Notiflix.Notify.warning(
+        'Oops! Enter something in the search bar',
+        {
+          borderRadius: '8px',
+          fontSize: '18px',
+          cssAnimationStyle: 'zoom',
+          warning: {
+            background: '#483d8b',
+            textColor: '#e6e6fa',
+            notiflixIconColor: '#e6e6fa',
+          },
+        }
+      );
     }
 
     this.props.onSubmit(this.state.searchQuery);
@@ -25,15 +37,15 @@ export default class Searchbar extends Component {
 
   render() {
     return (
-      <header>
-        <form onSubmit={this.handleSubmit}>
-          <button type="submit">
-            <span>
-              <FcSearch />
-            </span>
-          </button>
+      <Header>
+        <Form onSubmit={this.handleSubmit}>
+          <Button type="submit">
+            <Icon>
+              <BsSearch size="1.7em" />
+            </Icon>
+          </Button>
 
-          <input
+          <Input
             type="text"
             autoComplete="off"
             autoFocus
@@ -41,8 +53,8 @@ export default class Searchbar extends Component {
             value={this.state.searchQuery}
             onChange={this.handleNameChange}
           />
-        </form>
-      </header>
+        </Form>
+      </Header>
     );
   }
 }

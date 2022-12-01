@@ -1,49 +1,85 @@
-// 'https://pixabay.com/api/?q=cat&page=1&key=30847710-2a74f0266730d3c25fa6c5c5e&image_type=photo&orientation=horizontal&per_page=12'
-
-// Не забудь, що під час пошуку за новим ключовим словом, необхідно скидати значення page до 1.
-
-// У відповіді від апі приходить масив об'єктів, в яких тобі цікаві лише наступні властивості.
-
-// id - унікальний ідентифікатор
-// webformatURL - посилання на маленьке зображення для списку карток
-// largeImageURL - посилання на велике зображення для модального вікна
-
 import React, { Component } from 'react';
-import Searchbar from './Searchbar';
 import Notiflix from 'notiflix';
+
+import fetchImages from '../utils/fetchImages';
+import Searchbar from './Searchbar';
+import ImageGallery from './ImageGallery';
+import Loader from './Loader';
+import Button from './Button';
+import { Wrapper, Error } from './App.styled';
 
 export default class App extends Component {
   state = {
     gallery: null,
     searchQuery: '',
     loading: false,
+    error: null,
+    page: 1,
   };
 
-  componentDidUpdate(_, prevState) {
+  async componentDidUpdate(_, prevState) {
     const prevQuery = prevState.searchQuery;
     const nextQuery = this.state.searchQuery;
+
     if (prevQuery !== nextQuery) {
-      this.setState({ loading: true });
-      fetch(
-        `https://pixabay.com/api/?q=${nextQuery}&page=1&key=30847710-2a74f0266730d3c25fa6c5c5e&image_type=photo&orientation=horizontal&per_page=12`
-      )
-        .then(response => response.json())
-        .then(gallery => this.setState({ gallery }))
-        .finally(() => this.setState({ loading: false }));
+      this.setState({ loading: true, gallery: null, page: 1 });
+
+      const response = await fetchImages(nextQuery, this.state.page);
+
+      if (!response.total) {
+        return Notiflix.Notify.warning(
+          'Oops! Enter something in the search bar',
+          {
+            borderRadius: '8px',
+            fontSize: '18px',
+            cssAnimationStyle: 'zoom',
+            warning: {
+              background: '#483d8b',
+              textColor: '#e6e6fa',
+              notiflixIconColor: '#e6e6fa',
+            },
+          }
+        );
+      }
+
+      if (this.state.page > 1 && this.state.page !== prevState.page) {
+        this.setState(prev => ({
+          gallery: [...prev.gallery, ...response.hits],
+        }));
+      }
+
+      this.setState({ gallery: response.hits, loading: false });
     }
   }
 
   handleFormSubmit = searchQuery => {
     this.setState({ searchQuery });
   };
+
+  handleLoadMoreImages = () => {
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }));
+  };
+
   render() {
-    const { loading, searchQuery, gallery } = this.state;
+    const { loading, gallery, error } = this.state;
+
     return (
       <>
         <Searchbar onSubmit={this.handleFormSubmit} />
-        {loading && <div>Загружаем</div>}
-        {!searchQuery && <p>Enter something in the search bar</p>}
-        {gallery && <p>{gallery.hits[0]['downloads']}</p>}
+        <Wrapper>
+          {loading && <Loader />}
+          {error && (
+            <Error>Oops. Something went wrong. Please try again!</Error>
+          )}
+          {gallery && (
+            <>
+              <ImageGallery gallery={gallery} />
+              <Button onClick={this.handleLoadMoreImages} />
+            </>
+          )}
+        </Wrapper>
       </>
     );
   }
