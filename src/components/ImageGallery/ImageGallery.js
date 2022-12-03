@@ -1,7 +1,6 @@
-// Список карток зображень. Створює DOM-елемент наступної структури.
+import PropTypes from 'prop-types';
 import { List } from './ImageGallery.styled';
 import ImageGalleryItem from 'components/ImageGalleryItem';
-// import { Component } from 'react';
 
 export default function ImageGallery({ gallery }) {
   return (
@@ -17,3 +16,14 @@ export default function ImageGallery({ gallery }) {
     </List>
   );
 }
+
+ImageGallery.propTypes = {
+  gallery: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      webformatURL: PropTypes.string.isRequired,
+      largeImageURL: PropTypes.string.isRequired,
+      tags: PropTypes.string.isRequired,
+    })
+  ),
+};

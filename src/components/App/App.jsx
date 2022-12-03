@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import Notiflix from 'notiflix';
 
-import fetchImages from '../utils/fetchImages';
-import Searchbar from './Searchbar';
-import ImageGallery from './ImageGallery';
-import Loader from './Loader';
-import Button from './Button';
+import fetchImages from '../../utils/fetchImages';
+import NotificationWarning from './NotificationWarning';
+import Searchbar from '../Searchbar';
+import ImageGallery from '../ImageGallery';
+import Loader from '../Loader';
+import Button from '../Button';
 import { Wrapper, Error } from './App.styled';
 
 export default class App extends Component {
@@ -27,18 +27,11 @@ export default class App extends Component {
       const response = await fetchImages(nextQuery, this.state.page);
 
       if (!response.total) {
-        return Notiflix.Notify.warning(
-          'Oops! Enter something in the search bar',
-          {
-            borderRadius: '8px',
-            fontSize: '18px',
-            cssAnimationStyle: 'zoom',
-            warning: {
-              background: '#483d8b',
-              textColor: '#e6e6fa',
-              notiflixIconColor: '#e6e6fa',
-            },
-          }
+        return (
+          NotificationWarning(),
+          this.setState(() => ({
+            loading: false,
+          }))
         );
       }
 

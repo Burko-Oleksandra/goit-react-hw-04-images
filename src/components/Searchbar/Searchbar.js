@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { BsSearch } from 'react-icons/bs';
-import Notiflix from 'notiflix';
+import NotificationWarning from './NotificationWarning';
 import { Form, Header, Button, Icon, Input } from './Searchbar.styled';
 
 export default class Searchbar extends Component {
@@ -16,19 +16,7 @@ export default class Searchbar extends Component {
     event.preventDefault();
 
     if (this.state.searchQuery.trim() === '') {
-      return Notiflix.Notify.warning(
-        'Oops! Enter something in the search bar',
-        {
-          borderRadius: '8px',
-          fontSize: '18px',
-          cssAnimationStyle: 'zoom',
-          warning: {
-            background: '#483d8b',
-            textColor: '#e6e6fa',
-            notiflixIconColor: '#e6e6fa',
-          },
-        }
-      );
+      return NotificationWarning();
     }
 
     this.props.onSubmit(this.state.searchQuery);
