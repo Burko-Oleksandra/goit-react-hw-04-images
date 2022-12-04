@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import fetchImages from '../../utils/fetchImages';
 import NotificationWarning from './NotificationWarning';
@@ -8,73 +8,128 @@ import Loader from '../Loader';
 import Button from '../Button';
 import { Wrapper, Error } from './App.styled';
 
-export default class App extends Component {
-  state = {
-    gallery: null,
-    searchQuery: '',
-    loading: false,
-    error: null,
-    page: 1,
-  };
+export default function App() {
+  const [gallery, setGallery] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
 
-  async componentDidUpdate(_, prevState) {
+  useEffect(() => {
     const prevQuery = prevState.searchQuery;
     const nextQuery = this.state.searchQuery;
 
     if (prevQuery !== nextQuery || this.state.page !== prevState.page) {
-      this.setState({ loading: true });
+      setLoading(true);
 
-      const response = await fetchImages(nextQuery, this.state.page);
+      const response = fetchImages(searchQuery, page);
 
       if (!response.total) {
-        return (
-          NotificationWarning(),
-          this.setState(() => ({
-            loading: false,
-          }))
-        );
+        return NotificationWarning(), setLoading(true);
       }
 
-      if (this.state.page > 1) {
-        return this.setState(prev => ({
-          gallery: [...prev.gallery, ...response.hits],
-          loading: false,
-        }));
+      if (page > 1) {
+        return setGallery(prev => [...prev, ...response.hits]);
       }
 
-      this.setState({ gallery: response.hits, loading: false });
+      setGallery(response.hits);
+      setLoading(false);
     }
+  });
+
+  function handleFormSubmit(searchQuery) {
+    setSearchQuery(searchQuery);
+    setPage(1);
   }
 
-  handleFormSubmit = searchQuery => {
-    this.setState({ searchQuery, page: 1 });
-  };
-
-  handleLoadMoreImages = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
-  };
-
-  render() {
-    const { loading, gallery, error } = this.state;
-
-    return (
-      <>
-        <Searchbar onSubmit={this.handleFormSubmit} />
-        <Wrapper>
-          {loading && <Loader />}
-          {error && (
-            <Error>Oops. Something went wrong. Please try again!</Error>
-          )}
-          {gallery && (
-            <>
-              <ImageGallery gallery={gallery} />
-              <Button onClick={this.handleLoadMoreImages} />
-            </>
-          )}
-        </Wrapper>
-      </>
-    );
+  function handleLoadMoreImages() {
+    setPage(prev => prev + 1);
   }
+
+  return (
+    <>
+      <Searchbar onSubmit={handleFormSubmit} />
+      <Wrapper>
+        {loading && <Loader />}
+        {error && <Error>Oops. Something went wrong. Please try again!</Error>}
+        {gallery && (
+          <>
+            <ImageGallery gallery={gallery} />
+            <Button onClick={handleLoadMoreImages} />
+          </>
+        )}
+      </Wrapper>
+    </>
+  );
 }
+
+// export default class App extends Component {
+//   state = {
+//     gallery: null,
+//     searchQuery: '',
+//     loading: false,
+//     error: null,
+//     page: 1,
+//   };
+
+//   async componentDidUpdate(_, prevState) {
+//     const prevQuery = prevState.searchQuery;
+//     const nextQuery = this.state.searchQuery;
+
+//     if (prevQuery !== nextQuery || this.state.page !== prevState.page) {
+//       this.setState({ loading: true });
+
+//       const response = await fetchImages(nextQuery, this.state.page);
+
+//       if (!response.total) {
+//         return (
+//           NotificationWarning(),
+//           this.setState(() => ({
+//             loading: false,
+//           }))
+//         );
+//       }
+
+//       if (this.state.page > 1) {
+//         return this.setState(prev => ({
+//           gallery: [...prev.gallery, ...response.hits],
+//           loading: false,
+//         }));
+//       }
+
+//       this.setState({ gallery: response.hits, loading: false });
+//     }
+//   }
+
+//   handleFormSubmit = searchQuery => {
+//     this.setState({ searchQuery, page: 1 });
+//   };
+
+//   handleLoadMoreImages = () => {
+//     this.setState(prevState => ({
+//       page: prevState.page + 1,
+//     }));
+//   };
+
+//   render() {
+//     const { loading, gallery, error } = this.state;
+
+//     return (
+//       <>
+//         <Searchbar onSubmit={this.handleFormSubmit} />
+//         <Wrapper>
+//           {loading && <Loader />}
+//           {error && (
+//             <Error>Oops. Something went wrong. Please try again!</Error>
+//           )}
+//           {gallery && (
+//             <>
+//               <ImageGallery gallery={gallery} />
+//               <Button onClick={this.handleLoadMoreImages} />
+//             </>
+//           )}
+//         </Wrapper>
+//       </>
+//     );
+//   }
+// }
