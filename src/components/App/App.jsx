@@ -12,30 +12,25 @@ export default function App() {
   const [gallery, setGallery] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error] = useState(null);
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    const prevQuery = prevState.searchQuery;
-    const nextQuery = this.state.searchQuery;
+    setLoading(true);
+    const response = fetchImages(searchQuery, page);
+    console.log(response);
 
-    if (prevQuery !== nextQuery || this.state.page !== prevState.page) {
-      setLoading(true);
-
-      const response = fetchImages(searchQuery, page);
-
-      if (!response.total) {
-        return NotificationWarning(), setLoading(true);
-      }
-
-      if (page > 1) {
-        return setGallery(prev => [...prev, ...response.hits]);
-      }
-
-      setGallery(response.hits);
-      setLoading(false);
+    if (!response.total) {
+      return NotificationWarning(), setLoading(true);
     }
-  });
+
+    if (page > 1) {
+      return setGallery(prev => [...prev, ...response.hits]);
+    }
+
+    setGallery(response.hits);
+    setLoading(false);
+  }, [searchQuery, page]);
 
   function handleFormSubmit(searchQuery) {
     setSearchQuery(searchQuery);
