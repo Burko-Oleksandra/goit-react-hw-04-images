@@ -14,22 +14,34 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [error] = useState(null);
   const [page, setPage] = useState(1);
+  const [totalHits, setTotalHits] = useState(null);
 
   useEffect(() => {
-    setLoading(true);
-    const response = fetchImages(searchQuery, page);
-    console.log(response);
+    if (searchQuery === '' && page === 1) return;
 
-    if (!response.total) {
-      return NotificationWarning(), setLoading(true);
-    }
+    const fetchData = async (searchQuery, page) => {
+      setLoading(true);
+      const response = await fetchImages(searchQuery, page);
 
-    if (page > 1) {
-      return setGallery(prev => [...prev, ...response.hits]);
-    }
+      if (!response.total) {
+        NotificationWarning();
+        setLoading(false);
+        return;
+      }
 
-    setGallery(response.hits);
-    setLoading(false);
+      if (page > 1) {
+        setGallery(prev => [...prev, ...response.hits]);
+        setTotalHits(response.totalHits);
+        setLoading(false);
+        return;
+      }
+
+      setGallery(response.hits);
+      setTotalHits(response.totalHits);
+      setLoading(false);
+    };
+
+    fetchData(searchQuery, page);
   }, [searchQuery, page]);
 
   function handleFormSubmit(searchQuery) {
@@ -41,6 +53,8 @@ export default function App() {
     setPage(prev => prev + 1);
   }
 
+  const showLoadMoreBtn = gallery?.length < totalHits;
+
   return (
     <>
       <Searchbar onSubmit={handleFormSubmit} />
@@ -50,7 +64,7 @@ export default function App() {
         {gallery && (
           <>
             <ImageGallery gallery={gallery} />
-            <Button onClick={handleLoadMoreImages} />
+            {showLoadMoreBtn && <Button onClick={handleLoadMoreImages} />}
           </>
         )}
       </Wrapper>
