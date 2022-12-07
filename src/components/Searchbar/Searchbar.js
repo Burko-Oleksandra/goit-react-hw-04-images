@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { BsSearch } from 'react-icons/bs';
+import PropTypes from 'prop-types';
+
 import NotificationWarning from './NotificationWarning';
 import { Form, Header, Button, Icon, Input } from './Searchbar.styled';
 
@@ -42,6 +44,10 @@ export default function Searchbar({ onSubmit }) {
     </Header>
   );
 }
+
+Searchbar.propTypes = {
+  onChange: PropTypes.func.isRequired,
+};
 
 // export default class Searchbar extends Component {
 //   state = {

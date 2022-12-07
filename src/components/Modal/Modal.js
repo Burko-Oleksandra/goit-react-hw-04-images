@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import PropTypes from 'prop-types';
 
 import { Overlay, ModalImg } from './Modal.styled';
 
@@ -36,6 +37,12 @@ export default function Modal({ largeImageUrl, text, onClick }) {
     modalRoot
   );
 }
+
+Modal.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  largeImageUrl: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
+};
 
 // export default class Modal extends Component {
 //   componentDidMount() {
